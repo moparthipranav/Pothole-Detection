@@ -1,43 +1,56 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from src.model.C2fModule import Conv, C2f
+
 
 class YOLOBackbone(nn.Module):
     def __init__(self, base_channels, base_depth):
         super().__init__()
+        c = base_channels
 
-        # Fitting the input 640 x 640 to 320 x 320
-        self.stem = Conv(3, base_channels, k=3, s=2)
+        # Stem: 640 → 320
+        self.stem = Conv(3, c, k=3, s=2)
 
-        # Stage 1: 320 x 320 -> 160 x 160 and Applying C2f
-        self.stage1_conv = Conv(base_channels, 2 * base_channels, k=3, s=2)
-        self.stage1_c2f = C2f(base_channels * 2, base_channels * 2, n=base_depth)
+        # Stage 1: 320 → 160
+        self.stage1_conv = Conv(c, c * 2, k=3, s=2)
+        self.stage1_c2f  = C2f(c * 2, c * 2, n=base_depth)
 
-        # Stage 2 (160x160 -> 80x80)
-        self.stage2_conv = Conv(base_channels * 2, base_channels * 4, k=3, s=2)
-        self.stage2_c2f = C2f(base_channels * 4, base_channels * 4, n=base_depth * 2)
-        
-        # Stage 3 (80x80 -> 40x40)
-        self.stage3_conv = Conv(base_channels * 4, base_channels * 8, k=3, s=2)
-        self.stage3_c2f = C2f(base_channels * 8, base_channels * 8, n=base_depth * 2)
-        
-        # Stage 4 (40x40 -> 20x20)
-        self.stage4_conv = Conv(base_channels * 8, base_channels * 16, k=3, s=2)
-        self.stage4_c2f = C2f(base_channels * 16, base_channels * 16, n=base_depth)
-        
-        # Final SPPF Layer
-        self.sppf = SPPF(base_channels * 16, base_channels * 16, k=5)
+        # Stage 2: 160 → 80
+        self.stage2_conv = Conv(c * 2, c * 4, k=3, s=2)
+        self.stage2_c2f  = C2f(c * 4, c * 4, n=base_depth * 2)
+
+        # Stage 3: 80 → 40
+        self.stage3_conv = Conv(c * 4, c * 8, k=3, s=2)
+        self.stage3_c2f  = C2f(c * 8, c * 8, n=base_depth * 2)
+
+        # Stage 4: 40 → 20
+        self.stage4_conv = Conv(c * 8, c * 16, k=3, s=2)
+        self.stage4_c2f  = C2f(c * 16, c * 16, n=base_depth)
+
+        # SPPF (keeps 20×20)
+        self.sppf = SPPF(c * 16, c * 16, k=5)
 
     def forward(self, x):
         x = self.stem(x)
-        p1 = self.stage1_c2f(self.stage1_conv(x))
-        p2 = self.stage2_c2f(self.stage2_conv(p1))
-        p3 = self.stage3_c2f(self.stage3_conv(p2))
-        p4 = self.stage4_c2f(self.stage4_conv(p3))
-        p5 = self.sppf(self.stage4_c2f(p4))
-        
-        return p3, p4, p5  # We return multiple scales for the Neck/Head
+
+        x = self.stage1_c2f(self.stage1_conv(x))
+        p2 = x                         # 160×160
+
+        x = self.stage2_c2f(self.stage2_conv(x))
+        p3 = x                         # 80×80
+
+        x = self.stage3_c2f(self.stage3_conv(x))
+        p4 = x                         # 40×40
+
+        x = self.stage4_c2f(self.stage4_conv(x))
+        p5 = self.sppf(x)              # 20×20
+
+        print("p2:", p2.shape)
+        print("p3:", p3.shape)
+        print("p4:", p4.shape)
+        print("p5:", p5.shape)
+
+        return p2, p3, p4, p5
     
 class SPPF(nn.Module):
     """Spatial Pyramid Pooling - Fast (SPPF) layer for YOLOv8."""
