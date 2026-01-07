@@ -18,14 +18,8 @@ def image_to_matrix(image_path, size = 640):
     img_tensor = transform(image).unsqueeze(0)
     return img_tensor
 
-# ---- Running the test -----
-my_input = image_to_matrix('src/model/tests/Test.jpg', size=640)
-
-print(f"Matrix shape ready for backbone: {my_input.shape}")
 def test_backbone(model, input_size=640):
-    # 1. Create a dummy image (Batch size = 1, Channels = 3, H=640, W=640)
-    # Using 1s or random values is fine for shape testing
-    dummy_img = torch.randn(1, 3, input_size, input_size)
+    dummy_img = image_to_matrix('src/model/tests/Test.jpg', size=640)
     print(f"Input Shape: {dummy_img.shape}\n" + "-"*30)
 
     # 2. Pass through Stem
@@ -43,12 +37,11 @@ def test_backbone(model, input_size=640):
     print(f"After Stage 2 (P3): {p3.shape}")
 
     # Get the feature map from P3 (64 channels)
-    # Let's look at the 10th channel
-    feature_map = p3[0, 10, :, :].detach().numpy()
+    # feature_map = p3[0, 10, :, :].detach().numpy()
 
-    plt.imshow(feature_map, cmap='viridis')
-    plt.title("Visualizing P3 - Channel 10")
-    plt.show()
+    # plt.imshow(feature_map, cmap='viridis')
+    # plt.title("Visualizing P3 - Channel 10")
+    # plt.show()
 
     # 5. Pass through Stage 3 (P4)
     x = model.stage3_conv(p3)
