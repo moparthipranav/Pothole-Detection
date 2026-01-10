@@ -45,11 +45,6 @@ class YOLOBackbone(nn.Module):
         x = self.stage4_c2f(self.stage4_conv(x))
         p5 = self.sppf(x)              # 20×20
 
-        print("p2:", p2.shape)
-        print("p3:", p3.shape)
-        print("p4:", p4.shape)
-        print("p5:", p5.shape)
-
         return p2, p3, p4, p5
     
 class SPPF(nn.Module):
