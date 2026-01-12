@@ -6,7 +6,7 @@ class DetectDecoder(nn.Module):
     DetectDecoder is responsible for the bounding box predictions and calculating the class probabilities
     '''
 
-    def __init__(self, nc=80, strides=(4,8,16,32)):
+    def __init__(self, nc=1, strides=(4,8,16,32)):
         super().__init__()
         self.nc = nc
         self.strides = strides

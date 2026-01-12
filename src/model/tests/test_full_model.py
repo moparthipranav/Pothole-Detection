@@ -2,7 +2,6 @@ import torch
 from src.model.YoloModel import YOLOModel
 from src.model.tests.BackboneTesting import image_to_matrix
 import matplotlib.pyplot as plt
-from src.components.DebugTrainer import DebugTrainer
 
 def show_tensor_plt(tensor):
     img = tensor.squeeze(0).cpu()
@@ -25,5 +24,7 @@ def test_full_forward():
 
     show_tensor_plt(my_input)
 
+
+    
 if __name__ == "__main__":
     test_full_forward()

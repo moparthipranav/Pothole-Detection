@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.model.C2fModule import C2f, Conv
-from src.model.C2fAcmix import C2f_ACmix
-from src.model.DetectionHead import DetectionHead
+from src.model.Layers.C2fModule import C2f, Conv
+from src.model.Layers.C2fAcmix import C2f_ACmix
+from src.model.Head.DetectionHead import DetectionHead
 
 
 class YoloNeckHead(nn.Module):

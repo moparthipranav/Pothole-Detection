@@ -1,11 +1,11 @@
 import torch
-from src.model.YoloNeck import YoloNeckHead  # adjust import if needed
+from src.model.Neck.YoloNeck import YoloNeckHead  # adjust import if needed
 
 
 def test_neck_forward():
     base_channels = 64
     base_depth = 2
-    n_classes = 80
+    n_classes = 1
 
     model = YoloNeckHead(
         base_channels=base_channels,

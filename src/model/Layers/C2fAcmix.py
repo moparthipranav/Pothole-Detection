@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from src.model.C2fModule import Conv
+from src.model.Layers.C2fModule import Conv
 
 class LocalConv(nn.Module):
     def __init__(self, c):

@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import torch
-from src.model.Backbone import YOLOBackbone
+from src.model.backbone.Backbone import YOLOBackbone
 from PIL import Image
 import torchvision.transforms as T
 
